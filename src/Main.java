@@ -1,4 +1,4 @@
-import java.util.Timer;
+import Utilities.User;
 
 public class Main {
     public static void main(String[] args) throws InterruptedException {
@@ -13,7 +13,7 @@ public class Main {
             System.out.println(user.getName() + ", " + user.getAge() + " years old.");
         }
 
-        System.out.println("User is now a teenager!");
+        System.out.println("Utilities.User is now a teenager!");
     }
 
     public static void life(User user) {
