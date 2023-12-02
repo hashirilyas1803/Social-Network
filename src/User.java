@@ -9,6 +9,10 @@ public class User {
         this.gender = gender;
     }
 
+    public void setAge(int age) {
+        this.age = age;
+    }
+
     public String getName() {
         return name;
     }
