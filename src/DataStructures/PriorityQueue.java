@@ -16,7 +16,8 @@ public class PriorityQueue<T extends Comparable<T>> {
         R = size - 1;
     }
 
-    public void enqueue(T obj) {
+    public void enqueue(T obj)
+    {
         if (size == 0) {
             R = F = ++F % max;
             Q[R] = obj;
@@ -39,14 +40,41 @@ public class PriorityQueue<T extends Comparable<T>> {
         }
     }
 
-    public T dequeue(){
-        if (size != 0) {
-            T temp = Q[F];
-            F = ++F % max;
-            size--;
-            return temp;
+    public T dequeue()
+    {
+        if (size != 0)
+        {
+            int index = findSmallest();
+            T value = Q[index];
+
+            for( int i = index ; i == F ; i = (i+max - 1)%max)
+                Q[(i+max - 1)%max] = Q[i];
+
+            return value;
         }
         return null;
+    }
+
+    public int findSmallest()
+    {
+        if (isEmpty())
+        {
+            return -1;
+        }
+
+        T smallest = Q[F];
+        int index = F;
+        int current = (F + 1) % Q.length;
+
+        while (current != (R + 1) % Q.length) {
+            if (Q[current].compareTo(smallest) < 0) {
+                smallest = Q[current];
+                index = current;
+            }
+            current = (current + 1) % Q.length;
+        }
+
+        return index;
     }
 
     public T peek() {
@@ -64,4 +92,8 @@ public class PriorityQueue<T extends Comparable<T>> {
 
     public boolean isEmpty(){ return size == 0;}
     public boolean isFull(){ return size == max;}
+
+    public int getSize() {
+        return size;
+    }
 }
