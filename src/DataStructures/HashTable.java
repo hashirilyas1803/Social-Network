@@ -5,15 +5,18 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 
-public class HashTable<T extends Comparable<T>> {
+public class HashTable<T extends Comparable<T>, U extends Comparable<U>> {
     // Toggle CONTROLLER_PIN true for quadratic probing and false for linear probing
     private final boolean CONTROLLER_PIN = true;
     private int[] collisions;
+    private U defaultValue;
     private class Node<T> {
-        T data;
+        T key;
+        U data;
         public Node() {
         }
-        public Node(T data) {
+        public Node(T key, U data) {
+            this.key = key;
             this.data = data;
         }
 
@@ -24,57 +27,79 @@ public class HashTable<T extends Comparable<T>> {
     }
     Node<T>[] table;
     Node<T> placeholder = new Node<>();
-    HashTable(int s){
+
+    // Constructor
+    HashTable(int s, U defaultValue){
         table = new Node[s+(s/3)];
         collisions = new int[size()];
+        this.defaultValue = defaultValue;
     }
-    public int strToInt(T obj) {
-        if (obj instanceof String temp) {
+
+    // Figure out the integer representation of every key
+    public int toInt(T key) {
+        if (key instanceof String temp) {
             int sum = 0;
             for (int i = 0; i < temp.length(); i++) {
                 sum += (temp.charAt(i) * (int)Math.pow(3, i));
             }
             return sum;
         }
+        else if (key instanceof Integer temp) {
+            int sum = 0, i = 0;
+            while (temp > 0) {
+                sum += ((temp % 10) * (int)Math.pow(3, i));
+                temp /= 10;
+                i++;
+            }
+            return sum;
+        }
         else
-            return obj.hashCode();
+            return key.hashCode();
     }
-    public int hash(T obj){
-        return strToInt(obj) % table.length;
+
+    // Return the default value if key doesn't exist. Return the data otherwise
+    public U getDefaultValue(T key) {
+        if (!find(key)) {
+            return defaultValue;
+        }
+        return table[findIndex(key)].data;
     }
-    public int rehash(T obj) {
+    public int hash(T key){
+        return toInt(key) % table.length;
+    }
+    public int rehash(T key) {
         int i = 1;
-        int hash = hash(obj);
+        int hash = hash(key);
         if (!CONTROLLER_PIN) {
             while (table[hash] != null) {
-                hash = (hash(obj) + i) % table.length;
+                hash = (hash(key) + i) % table.length;
                 i++;
             }
         }
         else {
             while (table[hash] != null) {
-                hash = (hash(obj) + (i * i)) % table.length;
+                hash = (hash(key) + (i * i)) % table.length;
                 i++;
             }
         }
         collisions[hash] = i;
         return hash;
     }
-    public void insert(T obj){
+    public void insert(T key, U obj){
         // Hash the given value to find out the index of insertion
-        int hash = hash(obj);
+        int hash = hash(key);
 
         // Rehash if the calculated index is occupied
         if (table[hash] != null )
-            hash = rehash(obj);
-        table[hash] = new Node<>(obj);
+            hash = rehash(key);
+        table[hash] = new Node<>(key, obj);
     }
-    public Boolean find(T obj) {
+    public Boolean find(T key) {
         // Return true if a valid index is returned
-        return findIndex(obj) != -1;
+        return findIndex(key) != -1;
     }
-    public int findIndex(T obj) {
-        int hash = hash(obj);
+    public int findIndex(T key) {
+        int hash = hash(key);
 
             // Continue checking the linear probing sequence if a placeholder is encountered
             if (CONTROLLER_PIN) {
@@ -87,7 +112,7 @@ public class HashTable<T extends Comparable<T>> {
                         return -1;
 
                     // Return the index of the value if found
-                    if (table[(hash + (i * i)) % table.length].data.equals(obj))
+                    if (table[(hash + (i * i)) % table.length].key.equals(key))
                         return (hash + (i * i)) % table.length;
                 }
             }
@@ -101,7 +126,7 @@ public class HashTable<T extends Comparable<T>> {
                         return -1;
 
                     // Return the index of the value if found
-                    if (table[(hash + i) % table.length].data.equals(obj))
+                    if (table[(hash + i) % table.length].key.equals(key))
                         return (hash + i) % table.length;
                 }
             }
@@ -109,19 +134,19 @@ public class HashTable<T extends Comparable<T>> {
         // Return -1 otherwise to signify that the value was not found
         return -1;
     }
-    public boolean delete(T obj){
-        int hash = hash(obj);
+    public boolean delete(T key){
+        int hash = hash(key);
 
         // Check if the value exists
         if (table[hash] != null) {
             if (table[hash].data != null) {
                 // Delete the value by following the linear probing sequence
-                if (table[hash].data.equals(obj)) {
+                if (table[hash].key.equals(key)) {
                     table[hash] = placeholder;
                     return true;
                 }
                 else {
-                    int index = findIndex(obj);
+                    int index = findIndex(key);
                     if (index != -1) {
                         table[index] = placeholder;
                         return true;
@@ -140,7 +165,7 @@ public class HashTable<T extends Comparable<T>> {
             out = new PrintWriter(file);
             for (Node<T> obj : table) {
                 if (obj != null)
-                    out.println(obj + ": " + collisions[findIndex(obj.data)]);
+                    out.println(obj + ": " + collisions[findIndex(obj.key)]);
                 else
                     out.println(obj + ": No collisions");
             }
@@ -159,7 +184,7 @@ public class HashTable<T extends Comparable<T>> {
         for (Node<T> obj : table) {
             System.out.print(obj + ": ");
             if (obj != null)
-                System.out.println(collisions[findIndex(obj.data)]);
+                System.out.println(collisions[findIndex(obj.key)]);
             else
                 System.out.println("No collisions");
         }
