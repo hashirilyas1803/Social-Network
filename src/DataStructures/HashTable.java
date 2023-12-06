@@ -10,10 +10,12 @@ public class HashTable<T extends Comparable<T>> {
     private final boolean CONTROLLER_PIN = true;
     private int[] collisions;
     private class Node<T> {
+        T key;
         T data;
         public Node() {
         }
-        public Node(T data) {
+        public Node(T key, T data) {
+            this.key = key;
             this.data = data;
         }
 
@@ -28,7 +30,7 @@ public class HashTable<T extends Comparable<T>> {
         table = new Node[s+(s/3)];
         collisions = new int[size()];
     }
-    public int strToInt(T obj) {
+    public int toInt(T obj) {
         if (obj instanceof String temp) {
             int sum = 0;
             for (int i = 0; i < temp.length(); i++) {
@@ -36,45 +38,54 @@ public class HashTable<T extends Comparable<T>> {
             }
             return sum;
         }
+        else if (obj instanceof Integer temp) {
+            int sum = 0, i = 0;
+            while (temp > 0) {
+                sum += ((temp % 10) * (int)Math.pow(3, i));
+                temp /= 10;
+                i++;
+            }
+            return sum;
+        }
         else
             return obj.hashCode();
     }
-    public int hash(T obj){
-        return strToInt(obj) % table.length;
+    public int hash(T key){
+        return toInt(key) % table.length;
     }
-    public int rehash(T obj) {
+    public int rehash(T key) {
         int i = 1;
-        int hash = hash(obj);
+        int hash = hash(key);
         if (!CONTROLLER_PIN) {
             while (table[hash] != null) {
-                hash = (hash(obj) + i) % table.length;
+                hash = (hash(key) + i) % table.length;
                 i++;
             }
         }
         else {
             while (table[hash] != null) {
-                hash = (hash(obj) + (i * i)) % table.length;
+                hash = (hash(key) + (i * i)) % table.length;
                 i++;
             }
         }
         collisions[hash] = i;
         return hash;
     }
-    public void insert(T obj){
+    public void insert(T key, T obj){
         // Hash the given value to find out the index of insertion
-        int hash = hash(obj);
+        int hash = hash(key);
 
         // Rehash if the calculated index is occupied
         if (table[hash] != null )
-            hash = rehash(obj);
-        table[hash] = new Node<>(obj);
+            hash = rehash(key);
+        table[hash] = new Node<>(key, obj);
     }
-    public Boolean find(T obj) {
+    public Boolean find(T key) {
         // Return true if a valid index is returned
-        return findIndex(obj) != -1;
+        return findIndex(key) != -1;
     }
-    public int findIndex(T obj) {
-        int hash = hash(obj);
+    public int findIndex(T key) {
+        int hash = hash(key);
 
             // Continue checking the linear probing sequence if a placeholder is encountered
             if (CONTROLLER_PIN) {
@@ -87,7 +98,7 @@ public class HashTable<T extends Comparable<T>> {
                         return -1;
 
                     // Return the index of the value if found
-                    if (table[(hash + (i * i)) % table.length].data.equals(obj))
+                    if (table[(hash + (i * i)) % table.length].key.equals(key))
                         return (hash + (i * i)) % table.length;
                 }
             }
@@ -101,7 +112,7 @@ public class HashTable<T extends Comparable<T>> {
                         return -1;
 
                     // Return the index of the value if found
-                    if (table[(hash + i) % table.length].data.equals(obj))
+                    if (table[(hash + i) % table.length].key.equals(key))
                         return (hash + i) % table.length;
                 }
             }
@@ -109,19 +120,19 @@ public class HashTable<T extends Comparable<T>> {
         // Return -1 otherwise to signify that the value was not found
         return -1;
     }
-    public boolean delete(T obj){
-        int hash = hash(obj);
+    public boolean delete(T key){
+        int hash = hash(key);
 
         // Check if the value exists
         if (table[hash] != null) {
             if (table[hash].data != null) {
                 // Delete the value by following the linear probing sequence
-                if (table[hash].data.equals(obj)) {
+                if (table[hash].key.equals(key)) {
                     table[hash] = placeholder;
                     return true;
                 }
                 else {
-                    int index = findIndex(obj);
+                    int index = findIndex(key);
                     if (index != -1) {
                         table[index] = placeholder;
                         return true;
