@@ -1,6 +1,6 @@
 package DataStructures;
 
-public class LinkedList<Item> {
+public class LinkedList<Item extends Comparable<Item>> {
     private Node head ;
     int size;
 
@@ -8,11 +8,10 @@ public class LinkedList<Item> {
         head = null;
     }
 
-    private class Node
+    public class Node
     {
         private Item item;
         private Node next;
-
         public Node(Item data) {
             this.item = data;
         }
@@ -180,16 +179,16 @@ public class LinkedList<Item> {
         head = prev;
     }
 
-    public boolean Find(Item data) {
+    public Item Find(Item data) {
         // Searches the list for a particular element
         Node current = head;
         while (current != null)
         {
-            if (current.item.equals(data))
-                return true;
+            if (current.item.compareTo(data) == 0)
+                return current.item;
             current = current.next;
         }
-        return false;
+        return null;
     }
 
     public String toString() {

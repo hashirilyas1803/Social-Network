@@ -2,7 +2,7 @@ package Utilities;
 
 import DataStructures.LinkedList;
 
-public class User {
+public class User implements Comparable<User>{
     private String name;
     private int age;
     private boolean gender;
@@ -31,5 +31,10 @@ public class User {
 
     public boolean getGender() {
         return gender;
+    }
+
+    @Override
+    public int compareTo(User o) {
+        return 0;
     }
 }
