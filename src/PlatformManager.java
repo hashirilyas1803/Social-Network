@@ -31,7 +31,7 @@ public class PlatformManager {
         System.out.print("Gender(M/F): ");
         boolean gender = in.next().equals("M");
 
-        users.insert(new User(name, username, password, age, gender));
+//        users.insert(new User(name, username, password, age, gender));
     }
 
     public void addFriend() {
@@ -46,7 +46,7 @@ public class PlatformManager {
             System.out.println("Such a user does not exist!");
             return;
         }
-        user.addFreind(friend);
+        user.addFriend(friend);
     }
     public void removeFriend() {
         User user = findUser();
@@ -76,7 +76,7 @@ public class PlatformManager {
         System.out.print("Username: ");
         String username = in.next();
 
-        return users.search(new User("", username, "", 0, false));
+        return users.search(new User("", username, "", 0, false , null));
     }
 
     public void deleteUser() {

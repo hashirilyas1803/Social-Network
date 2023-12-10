@@ -3,6 +3,7 @@ package DataStructures;
 import java.util.Arrays;
 
 public class BTree <T extends Comparable<T>>{
+    public int numberOfUsers;
     // Node class
     public class Node<T extends Comparable<T>> {
 
@@ -73,9 +74,13 @@ public class BTree <T extends Comparable<T>>{
     }
 
     public T search(T k, Node<T> current) {
+        if(k == null)
+            return null;
         int start = 0, end = current.n - 1, mid = 0;
         while (start <= end) {
             mid = (start + end) / 2;
+            if(current.keys[mid] == null)
+                return  null;
             if (current.keys[mid].compareTo(k) == 0)
                 return current.keys[mid];
             if (k.compareTo(current.keys[mid]) > 0)
@@ -95,8 +100,11 @@ public class BTree <T extends Comparable<T>>{
             root.keys[0] = k;
             // Update number of keys in root
             root.n = 1;
+            numberOfUsers++;
         }
         else {
+            if (search(k) != null)
+                return;
             if (root.n == (2 * t - 1)) {
                 // Declare new node and make it the new root
                 Node<T> newRoot = new Node<>(t, false);
@@ -113,6 +121,7 @@ public class BTree <T extends Comparable<T>>{
 
                 // Reassign the root node
                 root = newRoot;
+                numberOfUsers++;
             }
             else
                 insertNotFull(k, root);
@@ -122,7 +131,8 @@ public class BTree <T extends Comparable<T>>{
     public void insertNotFull(T k, Node<T> current) {
         // Set i to the index of the last element of the array kays
         int i = current.n - 1;
-
+        if(k == null )
+            return;
         // Check if the node is a leaf node
         if (current.leaf) {
             // Iteratively shift the elements in keys to the right to find the correct position for insertion
@@ -139,6 +149,8 @@ public class BTree <T extends Comparable<T>>{
             int start = 0, end = current.n - 1, mid = 0;
             while (start <= end) {
                 mid = (start + end) / 2;
+                if(current.keys[mid] == null)
+                    return;
                 if (current.keys[mid].compareTo(k) == 0)
                     return;
                 if (k.compareTo(current.keys[mid]) > 0)

@@ -116,7 +116,7 @@ public class Huffman
 
     public BufferedImage decodeImage()
     {
-        BufferedImage decodedImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_RGB);
+        BufferedImage decodedImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
 
         for(int y = 0 ; y < decodedImage.getHeight() ; y++)
         {

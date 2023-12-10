@@ -1,6 +1,7 @@
 package Utilities;
 import DataStructures.LinkedList;
 
+import java.awt.image.BufferedImage;
 import java.util.Arrays;
 
 public class User implements Comparable<User> {
@@ -11,7 +12,8 @@ public class User implements Comparable<User> {
     private boolean gender;
     private LinkedList<User> friends;
 
-    public User(String name, String username, String password, int age, boolean gender)
+    private Huffman image;
+    public User(String name, String username, String password, int age, boolean gender , BufferedImage image)
     {
         this.name = name;
         this.username = username;
@@ -19,6 +21,9 @@ public class User implements Comparable<User> {
         this.age = age;
         this.gender = gender;
         this.friends = new LinkedList<>();
+        this.image = new Huffman(image);
+        if(image != null)
+            this.image.compressImage();
     }
 
     public String getUsername() {
@@ -42,11 +47,14 @@ public class User implements Comparable<User> {
         return age;
     }
 
-    public boolean getGender() {
-        return gender;
+    public String getGender() {
+        if(gender == true)
+            return "male";
+        else
+            return "female";
     }
 
-    public void addFreind(User user) {
+    public void addFriend(User user) {
         this.friends.insert(user);
         user.friends.insert(this);
     }
@@ -66,18 +74,40 @@ public class User implements Comparable<User> {
         return Arrays.toString(names);
     }
 
+    public User[] getFriend() {
+        User[] list = new User[friends.size];
+        friends.toArray(list);
+        return list;
+    }
+
     @Override
     public int compareTo(User o) {
         return username.compareTo(o.getUsername());
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         User[] list = new User[friends.size];
         friends.toArray(list);
         return "User{" +
                 "Name: " + name + '\n' +
                 "Username: " + username + '\n' +
                 '}';
+    }
+
+    public String getPassword()
+    {
+        return password;
+    }
+
+    public Huffman getImage()
+    {
+        return image;
+    }
+
+    public void setImage(Huffman image)
+    {
+        this.image = image;
     }
 }

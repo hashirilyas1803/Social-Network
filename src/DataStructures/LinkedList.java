@@ -2,7 +2,7 @@ package DataStructures;
 
 public class LinkedList<Item extends Comparable<Item>> {
     private Node head ;
-    int size;
+    public int size;
 
     public LinkedList() {
         head = null;
@@ -206,5 +206,17 @@ public class LinkedList<Item extends Comparable<Item>> {
             n = n.next;
         }
         return s;
+    }
+
+    public void toArray(Item [] arr)
+    {
+        Node current = head;
+        int i = 0;
+        while(current != null)
+        {
+            arr[i] = current.item;
+            i++;
+            current =current.next;
+        }
     }
 }
