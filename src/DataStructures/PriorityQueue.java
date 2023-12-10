@@ -1,99 +1,120 @@
 package DataStructures;
 
-public class PriorityQueue<T extends Comparable<T>> {
-    public T[] Q; int F; int R; int max; int size;
-    //Constructor
-    public PriorityQueue(){
-        max = 10;
-        Q=(T[])new Comparable[max];
-        F=9; R=9;
-    }
-    // Constructor
-    public PriorityQueue(int size) {
-        this.max = size;
-        Q = (T[]) new Comparable[size];
-        F = size - 1;
-        R = size - 1;
+public class PriorityQueue <T extends Comparable<T>>
+{
+    private int size;
+    private T [] heap;
+
+    public PriorityQueue(int capacity)
+    {
+        this.size = 0;
+        this.heap = (T[]) new Comparable[capacity];
     }
 
-    public void enqueue(T obj)
+    public void insert(T data)
     {
-        if (size == 0) {
-            R = F = ++F % max;
-            Q[R] = obj;
+        if(size == 0)
+        {
+            heap[size] = data;
             size++;
             return;
         }
-        if (size != max) {
-            R = ++R % max;
-            size++;
-            for (int i = F; i != R || i == F; i = ++i % max) {
-                if (obj.compareTo(Q[i]) == -1) {
-                    for (int j = R; j != i; j = (j + max - 1) % max) {
-                        Q[j] = Q[(j + max - 1) % max];
-                    }
-                    Q[i] = obj;
-                    return;
-                }
-            }
-            Q[R] = obj;
-        }
+
+        Makespace();
+        heap[size] = data;
+        size++;
+        heapifyup();
     }
 
     public T dequeue()
     {
-        if (size != 0)
+        if(size == 0)
         {
-            int index = findSmallest();
-            T value = Q[index];
-
-            for( int i = index ; i == F ; i = (i+max - 1)%max)
-                Q[(i+max - 1)%max] = Q[i];
-
-            return value;
+            return heap[0];
         }
-        return null;
-    }
 
-    public int findSmallest()
+        T temp = heap[0];
+        heap[0] = heap[size - 1];
+        heapifyDown();
+        size--;
+        return temp;
+    }
+    public void Makespace()
     {
-        if (isEmpty())
+        if(size == heap.length)
         {
-            return -1;
+            copy();
+        }
+    }
+
+    public void copy()
+    {
+        T [] temp = (T[]) new Comparable[2* heap.length];
+
+        for( int i = 0 ; i < heap.length; i++)
+        {
+            temp[i] = heap[i];
         }
 
-        T smallest = Q[F];
-        int index = F;
-        int current = (F + 1) % Q.length;
+        heap = temp;
+    }
 
-        while (current != (R + 1) % Q.length) {
-            if (Q[current].compareTo(smallest) < 0) {
-                smallest = Q[current];
-                index = current;
+    public void heapifyup()
+    {
+        int index = size - 1;
+        while( heap[(index - 1)/2] != null && index > 0)
+        {
+            System.out.println("asdad");
+            if (heap[index].compareTo(heap[(index - 1) / 2]) < 0)
+            {
+                T temp = heap[(index - 1) / 2];
+                heap[(index - 1) / 2] = heap[index];
+                heap[index] = temp;
             }
-            current = (current + 1) % Q.length;
+            index = (index - 1)/2;
         }
-
-        return index;
     }
 
-    public T peek() {
-        return Q[F];
-    }
+    private void heapifyDown()
+    {
+        int index = 0;
+        while ( 2 * index + 1 < size)
+        {
+            int smallerChildIndex = 2 * index + 1;
 
-    public String toString() {
-        String s = "";
-        for (int i = F; i != R || i == F; i = ++i % max) {
-            s += Q[i] + " ";
+            if ( 2 * index + 2 < size && heap[2 * index + 2].compareTo(heap[2 * index + 1]) < 0)
+            {
+                smallerChildIndex = 2 * index + 2;
+            }
+
+            if (heap[index].compareTo(heap[smallerChildIndex]) < 0)
+            {
+                break;
+            } else {
+                swap(index, smallerChildIndex);
+            }
+
+            index = smallerChildIndex;
         }
-        s += Q[R];
-        return s;
     }
 
-    public boolean isEmpty(){ return size == 0;}
-    public boolean isFull(){ return size == max;}
+    private void swap(int index1, int index2)
+    {
+        T temp = heap[index1];
+        heap[index1] = heap[index2];
+        heap[index2] = temp;
+    }
 
-    public int getSize() {
+    public T min(T data1 , T data2)
+    {
+        if(data1.compareTo(data2) < 0 )
+            return data1;
+        else
+            return data2;
+    }
+
+    public int getSize()
+    {
         return size;
     }
 }

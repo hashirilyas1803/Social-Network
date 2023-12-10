@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 
-public class HashTable<T extends Comparable<T>, U extends Comparable<U>> {
+public class HashTable<T extends Comparable<T>, U > {
     // Toggle CONTROLLER_PIN true for quadratic probing and false for linear probing
     private final boolean CONTROLLER_PIN = true;
     private int[] collisions;
@@ -29,7 +29,7 @@ public class HashTable<T extends Comparable<T>, U extends Comparable<U>> {
     Node<T> placeholder = new Node<>();
 
     // Constructor
-    HashTable(int s, U defaultValue){
+    public HashTable(int s, U defaultValue){
         table = new Node[s+(s/3)];
         collisions = new int[size()];
         this.defaultValue = defaultValue;

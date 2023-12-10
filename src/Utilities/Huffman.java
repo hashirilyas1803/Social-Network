@@ -1,41 +1,15 @@
 package Utilities;
 
 
+import DataStructures.HashMap;
+import DataStructures.PriorityQueue;
 import java.awt.image.BufferedImage;
-import java.util.HashMap;
-import java.util.PriorityQueue;
+import java.util.Iterator;
 
 public class Huffman
 {
-    private class huff_Node implements Comparable<huff_Node>
-    {
-        int data;
-        int frequnency;
-        huff_Node left;
-        huff_Node right;
-
-        public huff_Node(int data , int frequnency )
-        {
-            this.data = data;
-            this.frequnency = frequnency;
-            this.left = null;
-            this.right = null;
-        }
-
-        @Override
-        public int compareTo(huff_Node o)
-        {
-            if( frequnency > o.frequnency)
-                return 1;
-            else if( frequnency == o.frequnency)
-                return 0;
-            else
-                return -1;
-        }
-    }
     private BufferedImage image;
-
-    String []   compressionarray;
+    String []  compressionarray;
     String [][] Final;
     private int currentindex = 0;
     int size = 0;
@@ -48,25 +22,28 @@ public class Huffman
 
     public void compressImage()
     {
-        int [][] density = ColordensityMatrix(image);
-        Final = new String[density.length][density[0].length];
 
-        HashMap<Integer , Integer> frequencymap = frequencyarray(density);
+        Final = new String[image.getHeight()][image.getWidth()];
 
-        java.util.PriorityQueue<huff_Node> queue = new PriorityQueue<>();
+       HashMap<Integer , Integer>  frequencymap = frequencyarray(image);
 
-        for(int e : frequencymap.keySet())
+        DataStructures.PriorityQueue<huff_Node> queue = new PriorityQueue<>(frequencymap.current_index);
+
+        Iterator<Integer> iterator = frequencymap.iterator();
+
+        while (iterator.hasNext())
         {
-            queue.add(new huff_Node(e , frequencymap.get(e)));
+            Integer i = iterator.next();
+            queue.insert(new huff_Node(i, frequencymap.getValue(i)));
         }
 
-        while(queue.size() > 1)
+        while(queue.getSize() > 1)
         {
-
-            huff_Node node1 = queue.poll();
+            System.out.println("dequeue");
+            huff_Node node1 = queue.dequeue();
             int freq1 = node1.frequnency;
 
-            huff_Node node2 = queue.poll();
+            huff_Node node2 = queue.dequeue();
             int freq2 = node2.frequnency;
 
             huff_Node par = new huff_Node(0 , freq2+freq1);
@@ -75,7 +52,7 @@ public class Huffman
             par.right = node2;
             root = par;
 
-            queue.add(par);
+            queue.insert(par);
             size++;
 
         }
@@ -83,33 +60,18 @@ public class Huffman
         compressionarray = new String[size + 1];
         String code ="";
         fill();
-        setCompressionarray(root,code ,density);
+        setCompressionarray(root, code , image);
         currentindex = 0;
     }
-    private int [][] ColordensityMatrix(BufferedImage bffr_image)
+
+    private HashMap<Integer , Integer> frequencyarray(BufferedImage bffr_image)
     {
+        HashMap<Integer , Integer> frequencymap = new HashMap<>(  (bffr_image.getWidth()* bffr_image.getHeight())/4);
 
-        int [][] density_matrix = new int[bffr_image.getHeight()][bffr_image.getWidth()];
-
-        for( int i = 0 ; i < density_matrix.length; i++)
+        for( int i = 0 ; i < bffr_image.getHeight(); i++)
         {
-            for( int j = 0 ; j < density_matrix[0].length ; j++)
-                density_matrix[i][j] = bffr_image.getRGB(j,i);
-        }
-
-        return density_matrix;
-    }
-
-    private HashMap<Integer, Integer> frequencyarray(int [][] arr)
-    {
-        HashMap<Integer , Integer > frequencymap = new HashMap<>();
-
-        for( int[] e : arr)
-        {
-            for (int number : e)
-            {
-                frequencymap.put(number, frequencymap.getOrDefault(number, 0) + 1);
-            }
+            for( int j = 0 ; j < bffr_image.getWidth() ; j++)
+                frequencymap.put(bffr_image.getRGB(j,i) , frequencymap.getDefaultvalue(bffr_image.getRGB(j,i) , 0) + 1);
         }
         return frequencymap;
     }
@@ -128,17 +90,17 @@ public class Huffman
         else
             return false;
     }
-    public void setCompressionarray(huff_Node node, String s , int [][] density)
+    public void setCompressionarray(huff_Node node, String s , BufferedImage Image)
     {
-
+        System.out.println("work");
         if (node.left == null && node.right == null && node.data != 0)
         {
             compressionarray[currentindex] += s;
-            for( int i = 0 ; i < density.length ; i++ )
+            for( int i = 0 ; i < image.getHeight() ; i++ )
             {
-                for( int j = 0 ; j < density[0].length ;j++)
+                for( int j = 0 ; j < image.getWidth() ;j++)
                 {
-                    if(node.data  == density[i][j])
+                    if(node.data  == image.getRGB(j,i))
                         Final[i][j] = compressionarray[currentindex];
                 }
             }
@@ -147,14 +109,14 @@ public class Huffman
         }
 
 
-        setCompressionarray(node.left, s + "0" , density);
-        setCompressionarray(node.right, s + "1" ,density);
+        setCompressionarray(node.left, s + "0" , Image);
+        setCompressionarray(node.right, s + "1" ,Image);
     }
 
 
     public BufferedImage decodeImage()
     {
-        BufferedImage decodedImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_RGB);
+        BufferedImage decodedImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
 
         for(int y = 0 ; y < decodedImage.getHeight() ; y++)
         {
@@ -178,7 +140,6 @@ public class Huffman
 
                 decodedImage.setRGB(x,y,currentnode.data);
             }
-
         }
         return decodedImage;
     }
