@@ -2,6 +2,7 @@ package DataStructures;
 
 public class LinkedList<Item extends Comparable<Item>> {
     private Node head ;
+    private Node tail ;
     public int size;
 
     public LinkedList() {
@@ -49,25 +50,24 @@ public class LinkedList<Item extends Comparable<Item>> {
         current.next = temp;
         size++;
     }
-    public void insert ( Item data ) {
-        if ( head == null ) {
-            head = new Node ( data );
+    public void insert(Item data) {
+        if (head == null) {
+            tail = head = new Node(data);
             size++;
-            return ;
+            return;
         }
-        Node current = head ;
-        while ( current . next != null ) {
-            current = current . next ;
-        }
-        current . next = new Node ( data );
+
+        tail.next = new Node(data);
+        tail = tail.next;
         size++;
     }
+
 
     public void delete ( Item data ) {
         if ( head == null ) {
             return ;
         }
-        if ( head.item == data ) {
+        if ( head.item.compareTo(data ) == 0) {
             head = head . next ;
             size--;
             System . out . println (" removed ");
@@ -75,7 +75,7 @@ public class LinkedList<Item extends Comparable<Item>> {
         }
         Node current = head ;
         while ( current . next != null ) {
-            if ( current . next.item == data ) {
+            if ( current . next.item.compareTo(data) == 0 ) {
                 current . next = current . next . next ;
                 size--;
                 return ;

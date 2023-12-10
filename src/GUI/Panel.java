@@ -27,6 +27,8 @@ public class Panel extends JPanel implements ActionListener
     private JButton Logout;
     private JButton signup;
     private JButton finish;
+    private JButton delete;
+    private JButton back;
     private Huffman Default;
     private Huffman [] avatars = new Huffman[4];
 
@@ -127,6 +129,11 @@ public class Panel extends JPanel implements ActionListener
             SignUp_Fields[i-2].addActionListener(this);
         }
 
+        back = new JButton("BACK");
+        back.setSize(totalwidth/16 , totalheight/ 50);
+        back.setBounds(totalwidth - back.getWidth() - 20, totalheight - 8*back.getHeight(), back.getWidth() , back.getHeight());
+        this.add(back);
+        back.addActionListener(this);
 
         passwordField_signup = new JPasswordField();
         passwordField_signup.setSize(totalwidth/6 , totalheight/20);
@@ -166,27 +173,24 @@ public class Panel extends JPanel implements ActionListener
         g.drawString(user.getName() ,(int) (totalwidth*0.15) - 5 , (int)(totalheight*0.20) + totalheight/10 + 30 );
         g.setFont(new Font("sansserif", 0, 20));
         g.drawString("@"+user.getUsername() , (int) (totalwidth*0.15) - 5 , (int)(totalheight*0.20) + totalheight/10 + 55);
-        g.drawString(user.getGender() ,(int) (totalwidth*0.15) - 5 , (int)(totalheight*0.20) + totalheight/10 + 75);
-        g.drawString("," + user.getAge() ,(int) (totalwidth*0.15) + 50 , (int)(totalheight*0.20) + totalheight/10 + 75);
+        g.drawString(user.getGender() + "," + user.getAge(),(int) (totalwidth*0.15) - 5 , (int)(totalheight*0.20) + totalheight/10 + 75);
 
         Image profile = user.getImage().decodeImage().getScaledInstance(totalheight/10,totalheight/10 ,Image.SCALE_DEFAULT);
         g.drawImage(profile ,(int) (totalwidth*0.15), (int)(totalheight*0.20) , null );
         g.setColor(Color.white);
-        g.drawRect(((int) (totalwidth*0.15)) + 5 + totalwidth/10 , (int)(totalheight*0.20) + 5 + 2*totalheight/10 , (totalwidth - ((int)(totalheight*0.20) + 5 + totalheight/10))/2 ,(totalheight - ((int)(totalheight*0.20) + 5 + totalheight/10))/2 );
 
         User [] friends = user.getFriend();
         if(friends.length == 0)
             return;
-        int friend_width = (totalwidth - ((int)(totalheight*0.20) + 5 + totalheight/10))/4;
-        int friend_height = (totalheight - ((int)(totalheight*0.20) + 5 + totalheight/10))/friends.length;
-        int start_X = (int) (totalwidth*0.15) + 5 + totalwidth/10;
+
+        int friend_width = (totalwidth - totalwidth/20)/2 - totalwidth/10;
+        int friend_height = totalheight/20;
+        int start_X = ((int) (totalwidth*0.15) + 5 + totalwidth/10)/ 2;
         int start_Y = (int)(totalheight*0.20) + 5 + 2*totalheight/10;
-        for( int i = 0 ; i < friends.length/2 ;i++)
+
+        for (int i = 0; i < friends.length; i++)
         {
-            for(int j = 0 ; j < 2 ; j++)
-            {
-                drawfriendbar(start_X + i*friend_width,start_Y + i*friend_height , friend_width , friend_height ,friends[i+j] ,g);
-            }
+            drawfriendbar(start_X + (i % 2) * (friend_width), start_Y + (i / 2) * friend_height , friend_width, friend_height, friends[i], g);
         }
 
     }
@@ -206,11 +210,50 @@ public class Panel extends JPanel implements ActionListener
     {
 
         Toolkit.getDefaultToolkit().sync();
+
         if (e.getSource().equals(signup))
         {
             removeAll();
             PaintSecondary();
             repaint();
+        }
+        else if(e.getSource().equals(delete))
+        {
+            User[] friends = LoggedUser.getFriend();
+            for (int i = 0; i < friends.length; i++)
+            {
+                LoggedUser.removeFriend(friends[i]);
+            }
+            users.delete(LoggedUser);
+            Login_status = false;
+            LoggedUser = null;
+            removeAll();
+            InitializeComponents();
+            repaint();
+        }
+        else if(e.getSource().equals(back))
+        {
+            removeAll();
+            InitializeComponents();
+            repaint();
+        }
+        else if(e.getSource().equals(user_pageButtons[1]))
+        {
+            User temp = users.search(new User("",user_pagetext[1].getText() , "", 0 ,false,null));
+            if(temp != null && temp.compareTo(LoggedUser) != 0)
+            {
+                LoggedUser.removeFriend(temp);
+            }
+
+        }
+        else if (e.getSource().equals(user_pageButtons[0]))
+        {
+           User temp = users.search(new User("",user_pagetext[0].getText() , "", 0 ,false,null));
+           if(temp != null && temp.compareTo(LoggedUser) != 0)
+           {
+               LoggedUser.addFriend(temp);
+           }
+
         }
         else if (e.getSource().equals(finish))
         {
@@ -285,14 +328,44 @@ public class Panel extends JPanel implements ActionListener
             Login_status  = true;
 
             user_pagetext[0] = new JTextField();
-            user_pagetext[0].setSize((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth()/20 ,(int) Toolkit.getDefaultToolkit().getScreenSize().getHeight()/80 );
-            user_pagetext[0].setBounds(totalwidth - (int) (totalwidth*0.15) - 5 , (int)(totalheight*0.20) + totalheight/10 + 55, user_pagetext[0].getWidth() , user_pagetext[0].getHeight());
+            user_pagetext[0].setSize((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth()/10 ,(int) Toolkit.getDefaultToolkit().getScreenSize().getHeight()/40 );
+            user_pagetext[0].setBounds(totalwidth - (int) (totalwidth*0.15) - 80 , (int)(totalheight*0.20) + totalheight/10 + 10, user_pagetext[0].getWidth() , user_pagetext[0].getHeight());
             add(user_pagetext[0]);
 
-            user_pageButtons[0] = new JButton("ADD FRIEND");
+            JLabel label1= new JLabel("ADD FRIEND");
+            label1.setSize(user_pagetext[0].getWidth() , user_pagetext[0].getHeight());
+            label1.setBounds(user_pagetext[0].getX() - label1.getWidth(), user_pagetext[0].getY(), label1.getWidth() , label1.getHeight());
+            add(label1);
+
+            user_pageButtons[0] = new JButton("ADD");
             user_pageButtons[0].setSize((int) (Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 16) , (int) (Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 50) );
-            user_pageButtons[0].setBounds(user_pagetext[0].getX() + (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth()/50,(int)((int)( Toolkit.getDefaultToolkit().getScreenSize().getHeight())*0.20) - 5, user_pageButtons[0].getWidth() ,user_pageButtons[0].getHeight());
+            user_pageButtons[0].setBounds(user_pagetext[0].getX() + 2*user_pageButtons[0].getWidth(),user_pagetext[0].getY() , user_pageButtons[0].getWidth() ,user_pageButtons[0].getHeight());
+            label1.setForeground(new Color(224, 213, 213));
             add(user_pageButtons[0]);
+            user_pageButtons[0].addActionListener(this);
+
+            user_pagetext[1] = new JTextField();
+            user_pagetext[1].setSize((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth()/10 ,(int) Toolkit.getDefaultToolkit().getScreenSize().getHeight()/40 );
+            user_pagetext[1].setBounds(totalwidth - (int) (totalwidth*0.15) - 80 , (int)(totalheight*0.20) + totalheight/10 + 40, user_pagetext[1].getWidth() , user_pagetext[1].getHeight());
+            add(user_pagetext[1]);
+
+            JLabel label2= new JLabel("REMOVE FRIEND");
+            label2.setSize(user_pagetext[1].getWidth() , user_pagetext[1].getHeight());
+            label2.setForeground(new Color(224, 213, 213));
+            label2.setBounds(user_pagetext[1].getX() - label2.getWidth(), user_pagetext[1].getY(), label2.getWidth() , label2.getHeight());
+            add(label2);
+
+            user_pageButtons[1] = new JButton("REMOVE");
+            user_pageButtons[1].setSize((int) (Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 16) , (int) (Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 50) );
+            user_pageButtons[1].setBounds(user_pagetext[0].getX() + 2*user_pageButtons[1].getWidth(),user_pagetext[1].getY(), user_pageButtons[1].getWidth() ,user_pageButtons[1].getHeight());
+            add(user_pageButtons[1]);
+            user_pageButtons[1].addActionListener(this);
+
+            delete = new JButton("Delete");
+            delete.setSize((int) (Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 16) , (int) (Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 50) );
+            delete.setBounds(user_pagetext[0].getX() + 2*user_pageButtons[1].getWidth(),user_pagetext[0].getY() - 70, delete.getWidth() ,delete.getHeight());
+            add(delete);
+            delete.addActionListener(this);
 
             repaint();
         }
@@ -318,7 +391,9 @@ public class Panel extends JPanel implements ActionListener
 
     private void drawfriendbar(int x , int y , int width , int height,  User user, Graphics g)
     {
-        g.drawRect(x,y,width,height);
-        g.drawString( user.toString(), x + width/10 , y + height/20 );
+        if (user != null) {
+            g.drawRect(x,y,width,height);
+            g.drawString( user.toString(), x + width/20 , y + height/2 );
+        }
     }
 }

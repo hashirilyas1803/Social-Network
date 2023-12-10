@@ -40,10 +40,12 @@ public class main
         }
 //
         // Establish random friendships
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 1000; i++)
+        {
             User user1 = userBTree.search(new User("",generateRandomUsername() , "", 0 , false,null));
             User user2 = userBTree.search(new User("",generateRandomUsername() , "", 0 , false,null));
-            if (user1 != null && user2 != null && !user1.equals(user2)) {
+            if (user1 != null && user2 != null && !user1.equals(user2))
+            {
                 user1.addFriend(user2);
             }
         }
@@ -64,7 +66,8 @@ public class main
         return new User(name, username, password, age, gender , null);
     }
 
-    private static String getRandomName() {
+    private static String getRandomName()
+    {
         String[] names = random.nextBoolean() ? MALE_NAMES : FEMALE_NAMES;
         return names[random.nextInt(names.length)];
     }
@@ -72,7 +75,6 @@ public class main
     private static String  generateRandomUsername()
     {
         String temp = "user" + random.nextInt(1000);
-//        System.out.println(temp);
-        return temp; // Assuming usernames are unique
+        return temp;
     }
 }

@@ -55,13 +55,18 @@ public class User implements Comparable<User> {
     }
 
     public void addFriend(User user) {
-        this.friends.insert(user);
-        user.friends.insert(this);
+        if (friends.Find(user) == null) {
+            this.friends.insert(user);
+            user.friends.insert(this);
+        }
     }
 
-    public void removeFriend(User user) {
-        this.friends.delete(user);
-        user.friends.delete(this);
+    public void removeFriend(User user)
+    {
+        if (friends.Find(user) != null) {
+            this.friends.delete(user);
+            user.friends.delete(this);
+        }
     }
 
     public String viewFriends() {
@@ -90,10 +95,9 @@ public class User implements Comparable<User> {
     {
         User[] list = new User[friends.size];
         friends.toArray(list);
-        return "User{" +
-                "Name: " + name + '\n' +
-                "Username: " + username + '\n' +
-                '}';
+        return "Name: " + name + '\n' +
+                "Username: " + username + '\n'
+                ;
     }
 
     public String getPassword()
