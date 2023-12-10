@@ -1,14 +1,14 @@
 package DataStructures;
 
 public class LinkedList<Item> {
-    private Node head ;
-    int size;
+    private Node head;
+    public int size;
 
     public LinkedList() {
         head = null;
     }
 
-    private class Node
+    public class Node
     {
         private Item item;
         private Node next;
@@ -111,7 +111,7 @@ public class LinkedList<Item> {
         size--;
     }
 
-    public void removeAll(Item data) {
+    public void remove(Item data) {
         // Removes all instances of an element
         if ( head == null ) {
             return ;
@@ -119,6 +119,7 @@ public class LinkedList<Item> {
         if ( head .item.equals(data) ) {
             head = head . next ;
             size--;
+            return;
         }
         Node n = head;
         while (n.next != null) {
@@ -126,6 +127,7 @@ public class LinkedList<Item> {
             {
                 n.next = n.next.next;
                 size--;
+                return;
             }
             else
                 n = n.next;
@@ -180,6 +182,24 @@ public class LinkedList<Item> {
         head = prev;
     }
 
+    public Item get(int i) {
+        Node current = head;
+        for (int j = 0; j < i; j++) {
+            current = current.next;
+        }
+        return current.item;
+    }
+
+    public void toArray(Item[] arr) {
+        Node current = head;
+        int i = 0;
+        while (current != null) {
+            arr[i] = current.item;
+            i++;
+            current = current.next;
+        }
+    }
+
     public boolean Find(Item data) {
         // Searches the list for a particular element
         Node current = head;
@@ -194,7 +214,6 @@ public class LinkedList<Item> {
 
     public String toString() {
         // Returns a comma separated string of all the elements in the list
-
         if (head == null)
             return null;
         String s = "";

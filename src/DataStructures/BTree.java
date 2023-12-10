@@ -41,7 +41,7 @@ public class BTree <T extends Comparable<T>>{
     public int t;
 
     // Constructor (Initializes tree as empty)
-    BTree(int t) {
+    public BTree(int t) {
         this.root = null;
         this.t = t;
     }
@@ -76,7 +76,7 @@ public class BTree <T extends Comparable<T>>{
         int start = 0, end = current.n - 1, mid = 0;
         while (start <= end) {
             mid = (start + end) / 2;
-            if (current.keys[mid].equals(k))
+            if (current.keys[mid].compareTo(k) == 0)
                 return current.keys[mid];
             if (k.compareTo(current.keys[mid]) > 0)
                 start = mid + 1;
@@ -139,7 +139,7 @@ public class BTree <T extends Comparable<T>>{
             int start = 0, end = current.n - 1, mid = 0;
             while (start <= end) {
                 mid = (start + end) / 2;
-                if (current.keys[mid].equals(k))
+                if (current.keys[mid].compareTo(k) == 0)
                     return;
                 if (k.compareTo(current.keys[mid]) > 0)
                     start = mid + 1;
@@ -191,7 +191,7 @@ public class BTree <T extends Comparable<T>>{
         int start = 0, end = current.n - 1, mid = 0;
         while (start <= end) {
             mid = (start + end) / 2;
-            if (current.keys[mid].equals(k))
+            if (current.keys[mid].compareTo(k) == 0)
                 return mid;
             if (k.compareTo(current.keys[mid]) > 0)
                 start = mid + 1;
